@@ -5,12 +5,12 @@ import akka.javasdk.annotations.ComponentId;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.workflow.Workflow;
 import io.akka.ai.application.TaggingService;
+import io.akka.common.FutureUtils;
 import io.akka.tagging.domain.DischargeSummary;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggedDischargeSummary;
 import io.akka.tagging.domain.Tagging;
 import io.akka.tagging.domain.TaggingResult;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

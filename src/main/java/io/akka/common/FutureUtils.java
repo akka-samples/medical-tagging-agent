@@ -1,4 +1,4 @@
-package io.akka.tagging.application;
+package io.akka.common;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

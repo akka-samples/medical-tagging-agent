@@ -9,6 +9,7 @@ import akka.stream.Materializer;
 import io.akka.ai.application.AiTaggingService;
 import io.akka.ai.application.OpenAiClient;
 import io.akka.ai.application.TaggingService;
+import io.akka.common.KeyUtils;
 import io.akka.importer.application.FakeImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,12 @@ public class MediTagSetup implements ServiceSetup {
   private final TimerScheduler timerScheduler;
 
   public MediTagSetup(ComponentClient componentClient, Materializer materializer, TimerScheduler timerScheduler) {
+    if (!KeyUtils.hasValidKeys()) {
+      throw new IllegalStateException(
+        "No API keys found. When running locally, make sure you have a " + ".env.local file located under " +
+          "src/main/resources/ (see src/main/resources/.env.example). When running in production, " +
+          "make sure you have OPENAI_API_KEY defined as environment variable.");
+    }
     this.componentClient = componentClient;
     this.materializer = materializer;
     this.timerScheduler = timerScheduler;
