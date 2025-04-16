@@ -10,7 +10,6 @@ import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggedDischargeSummary;
 import io.akka.tagging.domain.Tagging;
 import io.akka.tagging.domain.TaggingResult;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executor;
 
 import static akka.Done.done;
 
@@ -29,10 +28,12 @@ public class TaggingWorkflow extends Workflow<Tagging> {
   public static final int AI_CALL_BATCH_SIZE = 10;
   private final TaggingService taggingService;
   private final ComponentClient componentClient;
+  private final Executor virtualThreadExecutor;
 
-  public TaggingWorkflow(TaggingService taggingService, ComponentClient componentClient) {
+  public TaggingWorkflow(TaggingService taggingService, ComponentClient componentClient, Executor virtualThreadExecutor) {
     this.taggingService = taggingService;
     this.componentClient = componentClient;
+    this.virtualThreadExecutor = virtualThreadExecutor;
   }
 
   public record StartTagging(String prompt, List<Integer> summaryIds) {
@@ -75,7 +76,11 @@ public class TaggingWorkflow extends Workflow<Tagging> {
   private CompletableFuture<TaggingBatchResult> runBatch(int batchSize) {
     var pendingSummaryIds = currentState().getPendingBatch(batchSize);
 
-    return FutureUtils.all(pendingSummaryIds.stream().map(this::tagSummary).toList())
+    var taggedInParallel = pendingSummaryIds.stream().map(id ->
+        CompletableFuture.supplyAsync(() -> tagSummary(id), virtualThreadExecutor)
+    ).toList();
+
+    return FutureUtils.all(taggedInParallel)
       .thenApply(taggedSummaries ->
         new TaggingBatchResult(pendingSummaryIds, countCorrect(taggedSummaries)));
   }
@@ -101,27 +106,24 @@ public class TaggingWorkflow extends Workflow<Tagging> {
       .sum();
   }
 
-  private CompletableFuture<TaggedDischargeSummary> tagSummary(Integer id) {
-    return componentClient.forKeyValueEntity(id.toString())
-      .method(DischargeSummaryEntity::get)
-      .invokeAsync()
-      .thenCompose(summary ->
-        taggingService.tagDischargeSummary(summary, currentState().prompt())
-          .thenCompose(taggingResult -> {
-            logger.info("Tagged summary {} with tag {} (confidence: {}%)",
-              summary.id(), taggingResult.tag(), taggingResult.confidencePercentage());
+  private TaggedDischargeSummary tagSummary(Integer id) {
+    var summary = componentClient.forKeyValueEntity(id.toString())
+        .method(DischargeSummaryEntity::get)
+        .invoke();
 
-            return createTaggedSummary(summary, taggingResult);
-          })
-          .thenApply(done -> {
-            logger.debug("Completed processing for discharge summary: {}", summary.id());
-            return done;
-          })
-          .exceptionallyCompose(error -> {
-            //TODO handle exception
-            logger.error("Tagging error for discharge summary: {}", summary.id(), error);
-            return createTaggedSummary(summary, errorTaggingResult(error));
-          })).toCompletableFuture();
+    try {
+      var taggingResult = taggingService.tagDischargeSummary(summary, currentState().prompt());
+
+      logger.info("Tagged summary {} with tag {} (confidence: {}%)", summary.id(), taggingResult.tag(), taggingResult.confidencePercentage());
+      var taggedSummary = createTaggedSummary(summary, taggingResult);
+
+      logger.debug("Completed processing for discharge summary: {}", summary.id());
+      return taggedSummary;
+    } catch (Throwable error) {
+      //TODO handle exception
+      logger.error("Tagging error for discharge summary: {}", summary.id(), error);
+      return createTaggedSummary(summary, errorTaggingResult(error));
+    }
   }
 
   private static TaggingResult errorTaggingResult(Throwable error) {
@@ -133,7 +135,7 @@ public class TaggingWorkflow extends Workflow<Tagging> {
     );
   }
 
-  private CompletionStage<TaggedDischargeSummary> createTaggedSummary(DischargeSummary summary, TaggingResult taggingResult) {
+  private TaggedDischargeSummary createTaggedSummary(DischargeSummary summary, TaggingResult taggingResult) {
     String taggingWorkflowId = currentState().id();
     String taggedId = taggingWorkflowId + "-" + summary.id();
     TaggedDischargeSummaryEntity.CreateCommand createCommand =
@@ -151,6 +153,6 @@ public class TaggingWorkflow extends Workflow<Tagging> {
     return componentClient
       .forKeyValueEntity(taggedId)
       .method(TaggedDischargeSummaryEntity::create)
-      .invokeAsync(createCommand);
+      .invoke(createCommand);
   }
 }

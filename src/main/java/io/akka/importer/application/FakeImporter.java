@@ -4,20 +4,14 @@ import akka.Done;
 import akka.javasdk.annotations.ComponentId;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.timedaction.TimedAction;
-import akka.stream.Materializer;
-import akka.stream.javadsl.Source;
 import io.akka.tagging.application.DischargeSummaryEntity;
-import io.akka.tagging.domain.HospitalizationTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.IntStream;
 
-import static akka.Done.done;
 import static io.akka.tagging.domain.HospitalizationTag.getRandomTag;
 
 
@@ -25,7 +19,6 @@ import static io.akka.tagging.domain.HospitalizationTag.getRandomTag;
 public class FakeImporter extends TimedAction {
 
   private static final Logger log = LoggerFactory.getLogger(FakeImporter.class);
-  private final Materializer materializer;
   private final ComponentClient componentClient;
   private final List<String> exampleSummaries = List.of(
     "Male, 68, came in with high fever, cough, and difficulty breathing. Diagnosed with pneumonia and needed IV antibiotics and oxygen. After 5 days in the hospital, he improved and was discharged with oral antibiotics and follow-up instructions. Hospitalization was necessary.",
@@ -39,24 +32,17 @@ public class FakeImporter extends TimedAction {
     "Male, 19, was admitted in diabetic ketoacidosis due to missed insulin doses. Treated in ICU with IV insulin and fluids. Stabilized and transitioned back to regular insulin injections. Hospitalization was critical and life-saving.",
     "Female, 4, came in dehydrated from vomiting and diarrhea. Given IV fluids and anti-nausea meds. Improved quickly and was discharged the next day. Hospitalization was precautionary and not strictly required."
   );
-  private final Random random;
 
-  public FakeImporter(Materializer materializer, ComponentClient componentClient) {
-    this.materializer = materializer;
+  public FakeImporter(ComponentClient componentClient) {
     this.componentClient = componentClient;
-    this.random = new Random();
   }
 
   public Effect importData(int howMany) {
-    return effects().asyncDone(
-      Source.from(IntStream.rangeClosed(1, howMany).boxed().toList())
-        .mapAsync(1, this::createRandomDischargeSummary)
-        .run(materializer.system())
-        .thenApply(__ -> {
-          log.info("Created {} random discharge summaries", howMany);
-          return done();
-        })
-    );
+    for (int i = 1; i < howMany; i++) {
+      createRandomDischargeSummary(i);
+    }
+    log.info("Created {} random discharge summaries", howMany);
+    return effects().done();
   }
 
   private CompletionStage<Done> createRandomDischargeSummary(int id) {

@@ -21,12 +21,10 @@ public class MediTagSetup implements ServiceSetup {
   private static final Logger logger = LoggerFactory.getLogger(MediTagSetup.class);
 
   private final ComponentClient componentClient;
-  private final Materializer materializer;
   private final TimerScheduler timerScheduler;
 
-  public MediTagSetup(ComponentClient componentClient, Materializer materializer, TimerScheduler timerScheduler) {
+  public MediTagSetup(ComponentClient componentClient, TimerScheduler timerScheduler) {
     this.componentClient = componentClient;
-    this.materializer = materializer;
     this.timerScheduler = timerScheduler;
   }
 
@@ -45,7 +43,7 @@ public class MediTagSetup implements ServiceSetup {
   @Override
   public DependencyProvider createDependencyProvider() {
 
-    var taggingService = new AiTaggingService(new OpenAiClient(), materializer);
+    var taggingService = new AiTaggingService(new OpenAiClient());
 
     return new DependencyProvider() {
       @Override

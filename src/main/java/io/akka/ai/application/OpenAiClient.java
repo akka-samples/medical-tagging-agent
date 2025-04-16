@@ -11,8 +11,6 @@ import io.akka.tagging.domain.TaggingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CompletionStage;
-
 public class OpenAiClient implements AIClient {
 
   private static final Logger log = LoggerFactory.getLogger(OpenAiClient.class);
@@ -33,7 +31,7 @@ public class OpenAiClient implements AIClient {
   }
 
   @Override
-  public CompletionStage<TaggingResult> call(String input) {
+  public TaggingResult call(String input) {
     log.trace("Calling OpenAI with input: {}", input);
     ChatModel model = ChatModel.GPT_4O;
     ResponseCreateParams params = ResponseCreateParams.builder()
@@ -41,25 +39,24 @@ public class OpenAiClient implements AIClient {
       .model(model)
       .build();
 
-    return client.async().responses().create(params)
-      .thenApply(response -> {
-        var rawTextResponse = response.output().get(0).asMessage().content().get(0).asOutputText().text();
-        log.debug("Received response: {}", rawTextResponse);
-        var cleanedJson = rawTextResponse
-          .replaceAll("(?s)```json\\s*", "")  // remove ```json and optional whitespace
-          .replaceAll("(?s)```", "")          // remove ```
-          .trim();
-        try {
-          OpenAiTaggingResult result = JsonSupport.getObjectMapper().readValue(cleanedJson, OpenAiTaggingResult.class);
-          return new TaggingResult(
-            result.tag,
-            result.confidencePercentage,
-            result.reasoning,
-            model.toString()
-          );
-        } catch (JsonProcessingException e) {
-          throw new RuntimeException("Error when parsing response" + rawTextResponse, e);
-        }
-      });
+    var response = client.responses().create(params);
+
+    var rawTextResponse = response.output().get(0).asMessage().content().get(0).asOutputText().text();
+    log.debug("Received response: {}", rawTextResponse);
+    var cleanedJson = rawTextResponse
+      .replaceAll("(?s)```json\\s*", "")  // remove ```json and optional whitespace
+      .replaceAll("(?s)```", "")          // remove ```
+      .trim();
+    try {
+      OpenAiTaggingResult result = JsonSupport.getObjectMapper().readValue(cleanedJson, OpenAiTaggingResult.class);
+      return new TaggingResult(
+        result.tag,
+        result.confidencePercentage,
+        result.reasoning,
+        model.toString()
+      );
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error when parsing response" + rawTextResponse, e);
+    }
   }
 }

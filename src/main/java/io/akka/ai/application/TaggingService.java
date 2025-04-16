@@ -7,5 +7,5 @@ import java.util.concurrent.CompletionStage;
 
 public interface TaggingService {
 
-  CompletionStage<TaggingResult> tagDischargeSummary(DischargeSummary dischargeSummary, String prompt);
+  TaggingResult tagDischargeSummary(DischargeSummary dischargeSummary, String prompt);
 }
