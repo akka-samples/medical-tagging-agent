@@ -1,13 +1,11 @@
 package io.akka.ai.application;
 
-import akka.stream.Materializer;
 import io.akka.tagging.domain.DischargeSummary;
 import io.akka.tagging.domain.TaggingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.concurrent.CompletionStage;
 
 /**
  * AI-based implementation of the TaggingService.
@@ -16,7 +14,6 @@ import java.util.concurrent.CompletionStage;
 public class AiTaggingService implements TaggingService {
 
   private final AIClient aiClient;
-  private final Materializer materializer;
 
   private static final Logger logger = LoggerFactory.getLogger(AiTaggingService.class);
 
@@ -64,13 +61,12 @@ public class AiTaggingService implements TaggingService {
     
     """;
 
-  public AiTaggingService(AIClient aiClient, Materializer materializer) {
+  public AiTaggingService(AIClient aiClient) {
     this.aiClient = aiClient;
-    this.materializer = materializer;
   }
 
   @Override
-  public CompletionStage<TaggingResult> tagDischargeSummary(DischargeSummary dischargeSummary, String prompt) {
+  public TaggingResult tagDischargeSummary(DischargeSummary dischargeSummary, String prompt) {
     logger.info("AI tagging service analyzing discharge summary: {}", dischargeSummary.id());
     // Call the AI client to analyze the discharge summary, add more details to the message
 

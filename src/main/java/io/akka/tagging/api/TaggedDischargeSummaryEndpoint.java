@@ -8,7 +8,6 @@ import io.akka.tagging.application.TaggedDischargeSummaryView;
 import io.akka.tagging.domain.TaggedDischargeSummary;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 @HttpEndpoint
 @Acl(allow = @Acl.Matcher(principal = Acl.Principal.ALL))
@@ -21,20 +20,20 @@ public class TaggedDischargeSummaryEndpoint {
   }
 
   @Get("/tagged-summaries/{taggingId}")
-  public CompletionStage<List<TaggedDischargeSummary>> get(String taggingId) {
-    return componentClient
+  public List<TaggedDischargeSummary> get(String taggingId) {
+    var taggedSummaries = componentClient
       .forView()
       .method(TaggedDischargeSummaryView::getAllForTagging)
-      .invokeAsync(taggingId)
-      .thenApply(TaggedDischargeSummaryView.TaggedSummaries::summaries);
+      .invoke(taggingId);
+    return taggedSummaries.summaries();
   }
 
   @Get("/tagged-summaries")
-  public CompletionStage<List<TaggedDischargeSummary>> getAll() {
-    return componentClient
+  public List<TaggedDischargeSummary> getAll() {
+    var taggedSummaries = componentClient
       .forView()
       .method(TaggedDischargeSummaryView::getAll)
-      .invokeAsync()
-      .thenApply(TaggedDischargeSummaryView.TaggedSummaries::summaries);
+      .invoke();
+    return taggedSummaries.summaries();
   }
 }
