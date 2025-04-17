@@ -22,10 +22,9 @@ public class MediTagSetup implements ServiceSetup {
   private static final Logger logger = LoggerFactory.getLogger(MediTagSetup.class);
 
   private final ComponentClient componentClient;
-  private final Materializer materializer;
   private final TimerScheduler timerScheduler;
 
-  public MediTagSetup(ComponentClient componentClient, Materializer materializer, TimerScheduler timerScheduler) {
+  public MediTagSetup(ComponentClient componentClient, TimerScheduler timerScheduler) {
     if (!KeyUtils.hasValidKeys()) {
       throw new IllegalStateException(
         "No API keys found. When running locally, make sure you have a " + ".env.local file located under " +
@@ -33,7 +32,6 @@ public class MediTagSetup implements ServiceSetup {
           "make sure you have OPENAI_API_KEY defined as environment variable.");
     }
     this.componentClient = componentClient;
-    this.materializer = materializer;
     this.timerScheduler = timerScheduler;
   }
 
@@ -52,7 +50,7 @@ public class MediTagSetup implements ServiceSetup {
   @Override
   public DependencyProvider createDependencyProvider() {
 
-    var taggingService = new AiTaggingService(new OpenAiClient(), materializer);
+    var taggingService = new AiTaggingService(new OpenAiClient());
 
     return new DependencyProvider() {
       @Override

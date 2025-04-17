@@ -7,13 +7,11 @@ import akka.javasdk.client.ComponentClient;
 import akka.stream.Materializer;
 import io.akka.tagging.application.DischargeSummaryEntity;
 import io.akka.tagging.application.DischargeSummaryView;
-import io.akka.tagging.application.DischargeSummaryView.DischargeSummaries;
 import io.akka.tagging.domain.DischargeSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
 
 @HttpEndpoint
@@ -35,19 +33,19 @@ public class DischargeSummaryEndpoint {
   }
 
   @Get("/summaries/{id}")
-  public CompletionStage<DischargeSummary> get(String id) {
+  public DischargeSummary get(String id) {
     return componentClient
       .forKeyValueEntity(id)
       .method(DischargeSummaryEntity::get)
-      .invokeAsync();
+      .invoke();
   }
 
   @Get("/summaries")
-  public CompletionStage<List<DischargeSummary>> getAll() {
-    return componentClient
+  public List<DischargeSummary> getAll() {
+    var dischargeSummaries = componentClient
       .forView()
       .method(DischargeSummaryView::getAll)
-      .invokeAsync()
-      .thenApply(DischargeSummaries::summaries);
+      .invoke();
+    return dischargeSummaries.summaries();
   }
 }
