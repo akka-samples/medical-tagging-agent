@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagged Discharge Summaries</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .timestamp {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .tag-badge {
+            font-size: 0.9em;
+            padding: 0.3em 0.6em;
+        }
+        .long-text {
+            max-width: 300px;
+            position: relative;
+        }
+        .long-text-preview {
+            max-height: none;
+            overflow: visible;
+            position: relative;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .long-text-preview.collapsed {
+            max-height: 80px;
+            overflow: hidden;
+        }
+        .long-text-preview.collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(transparent, white);
+        }
+        .description-cell, .reasoning-cell {
+            max-width: 250px;
+        }
+        .confidence-filter {
+            padding: 15px;
+            background-color: #f0f2f5;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+        }
+        .confidence-filter label {
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #495057;
+        }
+        .confidence-value {
+            display: inline-block;
+            min-width: 3rem;
+            text-align: center;
+            margin-left: 1rem;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>Tagged Discharge Summaries</h1>
+                <p class="text-muted">Viewing tagged summaries for tagging workflow ID: <span id="taggingIdDisplay">-</span></p>
+            </div>
+            <div>
+                <a href="index.html" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Taggings
+                </a>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Tagged Summaries</h5>
+                    <button id="refreshBtn" class="btn btn-sm btn-outline-primary">Refresh</button>
+                </div>
+                <div class="filters">
+                    <div class="confidence-filter mb-3">
+                        <label for="confidenceThreshold" class="form-label">
+                            <i class="bi bi-funnel-fill me-2"></i>Show entries with confidence below:
+                        </label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range" id="confidenceThreshold" min="0" max="100" value="100" style="height: 25px;">
+                            <span class="confidence-value" id="confidenceValue">100%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" id="showDifferentTagsOnly">
+                        <label class="form-check-label" for="showDifferentTagsOnly">
+                            <i class="bi bi-exclamation-triangle me-1 text-warning"></i>
+                            Show only where expert and AI tags differ
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="loading" class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading tagged summaries...</p>
+                </div>
+                <div id="content" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Created At</th>
+                                    <th>Tagged At</th>
+                                    <th>Description</th>
+                                    <th>Expert Tag</th>
+                                    <th>AI Tag</th>
+                                    <th>Confidence</th>
+                                    <th>Reasoning</th>
+                                    <th>AI model</th>
+                                </tr>
+                            </thead>
+                            <tbody id="taggedSummariesTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noData" class="alert alert-info" style="display: none;">
+                        No tagged summaries found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Content Modal -->
+    <div class="modal fade" id="textContentModal" tabindex="-1" aria-labelledby="textContentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="textContentModalLabel">Text Content</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="fullTextContent" class="p-3 bg-light" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get tagging ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const taggingId = urlParams.get('id');
+            
+            if (!taggingId) {
+                // No ID provided, show error
+                document.getElementById('taggingIdDisplay').textContent = 'Error: No ID provided';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('noData').textContent = 'Error: No tagging ID provided. Please return to the taggings page.';
+            } else {
+                // Set the tagging ID in the header
+                document.getElementById('taggingIdDisplay').textContent = taggingId;
+                
+                // Load data
+                fetchTaggedSummaries(taggingId);
+                
+                // Set up refresh button
+                document.getElementById('refreshBtn').addEventListener('click', () => {
+                    fetchTaggedSummaries(taggingId);
+                });
+                
+                // Set up filters
+                const confidenceThreshold = document.getElementById('confidenceThreshold');
+                const confidenceValue = document.getElementById('confidenceValue');
+                const showDifferentTagsOnly = document.getElementById('showDifferentTagsOnly');
+                
+                confidenceThreshold.addEventListener('input', applyFilters);
+                confidenceThreshold.addEventListener('change', applyFilters);
+                showDifferentTagsOnly.addEventListener('change', applyFilters);
+            }
+        });
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        // Get tag badge class based on tag value
+        function getTagBadgeClass(tag) {
+            switch(tag) {
+                case 'HOSPITALIZATION_REQUIRED':
+                    return 'bg-danger';
+                case 'HOSPITALIZATION_NOT_REQUIRED':
+                    return 'bg-success';
+                case 'UNCERTAIN':
+                    return 'bg-warning';
+                case 'ERROR':
+                    return 'bg-secondary';
+                default:
+                    return 'bg-info';
+            }
+        }
+
+        // Get a more readable tag name
+        function getReadableTagName(tag) {
+            switch(tag) {
+                case 'HOSPITALIZATION_REQUIRED':
+                    return 'Required';
+                case 'HOSPITALIZATION_NOT_REQUIRED':
+                    return 'Not Required';
+                case 'UNCERTAIN':
+                    return 'Uncertain';
+                case 'ERROR':
+                    return 'Error';
+                default:
+                    return tag;
+            }
+        }
+
+        // Create long text element with modal show more functionality
+        function createLongTextElement(text, title = 'Full Text') {
+            if (!text) return document.createTextNode('N/A');
+            
+            const container = document.createElement('div');
+            container.className = 'long-text';
+            
+            const preview = document.createElement('div');
+            preview.className = 'long-text-preview collapsed';
+            preview.textContent = text;
+            container.appendChild(preview);
+            
+            const button = document.createElement('a');
+            button.className = 'btn btn-sm btn-link';
+            button.textContent = 'Show more';
+            button.href = '#';
+            button.onclick = (e) => {
+                e.preventDefault();
+                
+                // Set the modal content and title
+                document.getElementById('fullTextContent').textContent = text;
+                document.getElementById('textContentModalLabel').textContent = title;
+                
+                // Show the modal
+                const textContentModal = new bootstrap.Modal(document.getElementById('textContentModal'));
+                textContentModal.show();
+            };
+            container.appendChild(button);
+            
+            return container;
+        }
+
+        // Apply all filters to the table rows
+        function applyFilters() {
+            const confidenceThreshold = document.getElementById('confidenceThreshold');
+            const confidenceValue = document.getElementById('confidenceValue');
+            const showDifferentTagsOnly = document.getElementById('showDifferentTagsOnly');
+            
+            // Update displayed value for confidence threshold
+            confidenceValue.textContent = `${confidenceThreshold.value}%`;
+            
+            // Get threshold values
+            const thresholdValue = parseInt(confidenceThreshold.value);
+            const showOnlyDifferent = showDifferentTagsOnly.checked;
+            
+            // Apply filtering to table rows
+            const tableRows = document.querySelectorAll('#taggedSummariesTable tr');
+            tableRows.forEach(row => {
+                // Start with visible
+                let shouldShow = true;
+                
+                // Apply confidence filter
+                const confidenceCell = row.querySelector('td:nth-child(7)'); // 7th column is confidence
+                if (confidenceCell) {
+                    const confidenceText = confidenceCell.querySelector('small');
+                    if (confidenceText) {
+                        const confidence = parseInt(confidenceText.textContent);
+                        // Hide if confidence is greater than threshold
+                        if (confidence > thresholdValue) {
+                            shouldShow = false;
+                        }
+                    }
+                }
+                
+                // Apply different tags filter if checked
+                if (showOnlyDifferent && shouldShow) {
+                    // Get expert tag (4th column) and AI tag (5th column)
+                    const expertTagCell = row.querySelector('td:nth-child(5)');
+                    const aiTagCell = row.querySelector('td:nth-child(6)');
+                    
+                    if (expertTagCell && aiTagCell) {
+                        // Extract tag values from the badge spans
+                        const expertTagSpan = expertTagCell.querySelector('span.badge');
+                        const aiTagSpan = aiTagCell.querySelector('span.badge');
+                        
+                        if (expertTagSpan && aiTagSpan) {
+                            // If expert tag equals AI tag, hide the row (when filter is active)
+                            if (expertTagSpan.textContent === aiTagSpan.textContent) {
+                                shouldShow = false;
+                            }
+                        } else if (expertTagCell.textContent === aiTagCell.textContent) {
+                            // Fallback comparison if spans not found
+                            shouldShow = false;
+                        }
+                    }
+                }
+                
+                // Set display based on both filters
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+        
+        // Fetch tagged summaries for a specific tagging ID
+        async function fetchTaggedSummaries(taggingId) {
+            const loadingEl = document.getElementById('loading');
+            const contentEl = document.getElementById('content');
+            const noDataEl = document.getElementById('noData');
+            const tableEl = document.getElementById('taggedSummariesTable');
+            
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+            
+            try {
+                const response = await fetch(`http://localhost:9000/tagged-summaries/${taggingId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Clear existing table rows
+                tableEl.innerHTML = '';
+                
+                if (data.length === 0) {
+                    noDataEl.style.display = 'block';
+                } else {
+                    noDataEl.style.display = 'none';
+                    
+                    // Add rows to the table
+                    data.forEach(summary => {
+                        const row = document.createElement('tr');
+                        
+                        // Check if expert and AI tags differ
+                        if (summary.expertTag && summary.aiTag && summary.expertTag !== summary.aiTag) {
+                            row.classList.add('table-warning'); // Highlight rows with differing tags
+                        }
+                        
+                        // Create badges for tags
+                        const expertTagBadge = summary.expertTag ? 
+                            `<span class="badge ${getTagBadgeClass(summary.expertTag)} tag-badge">${getReadableTagName(summary.expertTag)}</span>` : 'N/A';
+                        
+                        const aiTagBadge = summary.aiTag ? 
+                            `<span class="badge ${getTagBadgeClass(summary.aiTag)} tag-badge">${getReadableTagName(summary.aiTag)}</span>` : 'N/A';
+                        
+                        // Create confidence bar
+                        const confidenceBar = summary.confidencePercentage ? 
+                            `<div class="progress">
+                                <div class="progress-bar bg-info" role="progressbar" 
+                                    style="width: ${summary.confidencePercentage}%" 
+                                    aria-valuenow="${summary.confidencePercentage}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small>${summary.confidencePercentage}%</small>` : 'N/A';
+                        
+                        row.innerHTML = `
+                            <td>${summary.id}</td>
+                            <td><span class="timestamp">${formatDate(summary.createdAt)}</span></td>
+                            <td><span class="timestamp">${formatDate(summary.taggedAt)}</span></td>
+                            <td class="description-cell"></td>
+                            <td>${expertTagBadge}</td>
+                            <td>${aiTagBadge}</td>
+                            <td>${confidenceBar}</td>
+                            <td class="reasoning-cell"></td>
+                            <td>${summary.aiModel || 'N/A'}</td>
+                        `;
+                        
+                        // Add the description with modal show more functionality
+                        const descriptionCell = row.querySelector('.description-cell');
+                        descriptionCell.appendChild(createLongTextElement(summary.description, 'Full Description'));
+                        
+                        // Add the reasoning with modal show more functionality
+                        const reasoningCell = row.querySelector('.reasoning-cell');
+                        reasoningCell.appendChild(createLongTextElement(summary.reasoning, 'Full Reasoning'));
+                        
+                        tableEl.appendChild(row);
+                    });
+                    
+                    // Apply all filters after populating the table
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error('Error fetching tagged summaries:', error);
+                tableEl.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-danger">
+                            Error loading data. Please try again.
+                        </td>
+                    </tr>
+                `;
+            } finally {
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
