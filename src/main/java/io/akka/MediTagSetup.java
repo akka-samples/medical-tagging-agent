@@ -5,8 +5,9 @@ import akka.javasdk.ServiceSetup;
 import akka.javasdk.annotations.Setup;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.timer.TimerScheduler;
-import akka.stream.Materializer;
+import io.akka.ai.application.AIClient;
 import io.akka.ai.application.AiTaggingService;
+import io.akka.ai.application.FakeAiClient;
 import io.akka.ai.application.OpenAiClient;
 import io.akka.ai.application.TaggingService;
 import io.akka.common.KeyUtils;
@@ -25,19 +26,13 @@ public class MediTagSetup implements ServiceSetup {
   private final TimerScheduler timerScheduler;
 
   public MediTagSetup(ComponentClient componentClient, TimerScheduler timerScheduler) {
-    if (!KeyUtils.hasValidKeys()) {
-      throw new IllegalStateException(
-        "No API keys found. When running locally, make sure you have a " + ".env.local file located under " +
-          "src/main/resources/ (see src/main/resources/.env.example). When running in production, " +
-          "make sure you have OPENAI_API_KEY defined as environment variable.");
-    }
     this.componentClient = componentClient;
     this.timerScheduler = timerScheduler;
   }
 
   @Override
   public void onStartup() {
-    timerScheduler.startSingleTimer("import-data",
+    timerScheduler.createSingleTimer("import-data",
       ofSeconds(1),
       componentClient.forTimedAction()
 //        .method(KidAidImporterAction::importData)
@@ -50,7 +45,7 @@ public class MediTagSetup implements ServiceSetup {
   @Override
   public DependencyProvider createDependencyProvider() {
 
-    var taggingService = new AiTaggingService(new OpenAiClient());
+    var taggingService = new AiTaggingService(getAiClient());
 
     return new DependencyProvider() {
       @Override
@@ -61,5 +56,13 @@ public class MediTagSetup implements ServiceSetup {
         return null;
       }
     };
+  }
+
+  private static AIClient getAiClient() {
+    if (KeyUtils.hasOpenAiKey()) {
+      return new OpenAiClient();
+    }
+    logger.warn("Ai client not configured. OPENAI_API_KEY environment variable is not set. Using Fake Ai client.");
+    return new FakeAiClient();
   }
 }

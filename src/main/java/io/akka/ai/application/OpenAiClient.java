@@ -11,6 +11,8 @@ import io.akka.tagging.domain.TaggingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.akka.common.KeyUtils.readOpenAiKey;
+
 public class OpenAiClient implements AIClient {
 
   private static final Logger log = LoggerFactory.getLogger(OpenAiClient.class);
@@ -24,7 +26,7 @@ public class OpenAiClient implements AIClient {
   }
 
   public OpenAiClient() {
-    var key = System.getenv("OPENAI_API_KEY");
+    var key = readOpenAiKey();
     this.client = OpenAIOkHttpClient.builder()
       .apiKey(key)
       .build();
