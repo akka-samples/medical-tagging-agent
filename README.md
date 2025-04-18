@@ -85,6 +85,10 @@ mvn compile exec:java
 
 The service will be available at `http://localhost:9000`.
 
+### Launch the tagging agent
+
+Go to http://localhost:9000 and click on the "Start Tagging Process".
+
 ### API Usage
 
 The application exposes several RESTful endpoints:
