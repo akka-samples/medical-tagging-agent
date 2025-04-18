@@ -7,9 +7,20 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
+        :root {
+            --white: #f1f1f1;
+            --yellow: #ffce4a;
+            --blue: #00dbdd;
+            --green: #72d35b;
+            --red: #ff5400;
+            --grey: #a6a6a6;
+            --black: #000000;
+        }
         body {
             padding: 20px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--black);
+            color: var(--white);
         }
         .container {
             max-width: 1200px;
@@ -17,8 +28,29 @@
         .header {
             margin-bottom: 30px;
         }
+        .card {
+            background-color: #121212;
+            border-color: var(--grey);
+        }
+        .card-header {
+            background-color: rgba(166, 166, 166, 0.1);
+            border-color: var(--grey);
+        }
+        .table {
+            color: var(--white);
+        }
         .table th {
-            background-color: #f8f9fa;
+            background-color: rgba(166, 166, 166, 0.2);
+            color: var(--yellow);
+        }
+        .table tbody tr {
+            background-color: var(--black);
+            border-bottom: 1px solid rgba(166, 166, 166, 0.2);
+        }
+        /* Disable hover effect */
+        .table-hover tbody tr:hover {
+            color: var(--white);
+            background-color: var(--black);
         }
         .loading {
             text-align: center;
@@ -26,7 +58,7 @@
         }
         .timestamp {
             font-size: 0.85rem;
-            color: #6c757d;
+            color: var(--grey);
         }
         .tag-badge {
             font-size: 0.9em;
@@ -55,23 +87,27 @@
             left: 0;
             right: 0;
             height: 30px;
-            background: linear-gradient(transparent, white);
+            background: linear-gradient(transparent, var(--black));
         }
         .description-cell, .reasoning-cell {
             max-width: 250px;
+            background-color: #121212 !important;
+            padding: 10px !important;
+            border-radius: 4px;
         }
         .confidence-filter {
             padding: 15px;
-            background-color: #f0f2f5;
+            background-color: #1e1e1e;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
             margin-bottom: 15px;
+            border: 1px solid var(--grey);
         }
         .confidence-filter label {
             margin-bottom: 0.75rem;
             font-weight: 500;
             font-size: 1rem;
-            color: #495057;
+            color: var(--white);
         }
         .confidence-value {
             display: inline-block;
@@ -80,7 +116,50 @@
             margin-left: 1rem;
             font-weight: 500;
             font-size: 1rem;
-            color: #0d6efd;
+            color: var(--blue);
+        }
+        .modal-content {
+            background-color: #121212;
+            color: var(--white);
+        }
+        .modal-header {
+            border-color: var(--grey);
+        }
+        .modal-footer {
+            border-color: var(--grey);
+        }
+        .form-control, .form-control:focus {
+            background-color: #1e1e1e;
+            border-color: var(--grey);
+            color: var(--white);
+        }
+        pre {
+            background-color: #1e1e1e !important;
+            color: var(--white) !important;
+        }
+        #fullTextContent {
+            background-color: #1e1e1e !important;
+            color: var(--white) !important;
+        }
+        #textContentModal .modal-body {
+            background-color: #121212;
+        }
+        .text-muted {
+            color: var(--grey) !important;
+        }
+        .form-check-input:checked {
+            background-color: var(--yellow);
+            border-color: var(--yellow);
+        }
+        .form-check-input:focus {
+            border-color: var(--grey);
+            box-shadow: 0 0 0 0.25rem rgba(255, 206, 74, 0.25);
+        }
+        .form-range::-webkit-slider-thumb {
+            background-color: var(--yellow);
+        }
+        .form-range::-moz-range-thumb {
+            background-color: var(--yellow);
         }
     </style>
 </head>
@@ -92,7 +171,7 @@
                 <p class="text-muted">Viewing tagged summaries for tagging workflow ID: <span id="taggingIdDisplay">-</span></p>
             </div>
             <div>
-                <a href="index.html" class="btn btn-outline-secondary">
+                <a href="index.html" class="btn" style="background-color: transparent; color: var(--grey); border-color: var(--grey);">
                     <i class="bi bi-arrow-left"></i> Back to Taggings
                 </a>
             </div>
@@ -102,7 +181,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 class="mb-0">Tagged Summaries</h5>
-                    <button id="refreshBtn" class="btn btn-sm btn-outline-primary">Refresh</button>
+                    <button id="refreshBtn" class="btn btn-sm" style="background-color: transparent; color: var(--yellow); border-color: var(--yellow);">Refresh</button>
                 </div>
                 <div class="filters">
                     <div class="confidence-filter mb-3">
@@ -126,14 +205,14 @@
             </div>
             <div class="card-body">
                 <div id="loading" class="loading">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border" style="color: var(--yellow);" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <p class="mt-2">Loading tagged summaries...</p>
                 </div>
                 <div id="content" style="display: none;">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -152,7 +231,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div id="noData" class="alert alert-info" style="display: none;">
+                    <div id="noData" class="alert" style="display: none; background-color: #1e1e1e; color: var(--grey); border-color: var(--grey);">
                         No tagged summaries found.
                     </div>
                 </div>
@@ -169,10 +248,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <pre id="fullTextContent" class="p-3 bg-light" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></pre>
+                    <pre id="fullTextContent" class="p-3" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto; background-color: #1e1e1e; color: var(--white);"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn" style="background-color: var(--grey); color: var(--black);" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -227,13 +306,13 @@
         function getTagBadgeClass(tag) {
             switch(tag) {
                 case 'HOSPITALIZATION_REQUIRED':
-                    return 'bg-danger';
+                    return 'bg-danger text-white';
                 case 'HOSPITALIZATION_NOT_REQUIRED':
-                    return 'bg-success';
+                    return 'bg-success text-white';
                 case 'UNCERTAIN':
-                    return 'bg-warning';
+                    return 'bg-warning text-dark';
                 case 'ERROR':
-                    return 'bg-secondary';
+                    return 'bg-secondary text-white';
                 default:
                     return 'bg-info';
             }
@@ -268,7 +347,10 @@
             container.appendChild(preview);
             
             const button = document.createElement('a');
-            button.className = 'btn btn-sm btn-link';
+            button.className = 'btn btn-sm';
+            button.style.color = 'var(--blue)';
+            button.style.backgroundColor = 'transparent';
+            button.style.padding = '2px 4px';
             button.textContent = 'Show more';
             button.href = '#';
             button.onclick = (e) => {
@@ -379,7 +461,7 @@
                         
                         // Check if expert and AI tags differ
                         if (summary.expertTag && summary.aiTag && summary.expertTag !== summary.aiTag) {
-                            row.classList.add('table-warning'); // Highlight rows with differing tags
+                            row.style.backgroundColor = 'rgba(255, 206, 74, 0.1)'; row.style.borderBottom = '1px solid var(--yellow)'; // Highlight rows with differing tags
                         }
                         
                         // Create badges for tags
@@ -392,8 +474,8 @@
                         // Create confidence bar
                         const confidenceBar = summary.confidencePercentage ? 
                             `<div class="progress">
-                                <div class="progress-bar bg-info" role="progressbar" 
-                                    style="width: ${summary.confidencePercentage}%" 
+                                <div class="progress-bar" role="progressbar" 
+                                    style="width: ${summary.confidencePercentage}%; background-color: var(--blue);" 
                                     aria-valuenow="${summary.confidencePercentage}" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
@@ -429,7 +511,7 @@
                 console.error('Error fetching tagged summaries:', error);
                 tableEl.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-danger">
+                        <td colspan="9" style="color: var(--red);">
                             Error loading data. Please try again.
                         </td>
                     </tr>
