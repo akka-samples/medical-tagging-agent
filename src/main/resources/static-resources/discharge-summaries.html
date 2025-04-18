@@ -7,20 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        :root {
-            --white: #f1f1f1;
-            --yellow: #ffce4a;
-            --blue: #00dbdd;
-            --green: #72d35b;
-            --red: #ff5400;
-            --grey: #a6a6a6;
-            --black: #000000;
-        }
         body {
             padding: 20px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--black);
-            color: var(--white);
         }
         .container {
             max-width: 1200px;
@@ -28,29 +17,8 @@
         .header {
             margin-bottom: 30px;
         }
-        .card {
-            background-color: #121212;
-            border-color: var(--grey);
-        }
-        .card-header {
-            background-color: rgba(166, 166, 166, 0.1);
-            border-color: var(--grey);
-        }
-        .table {
-            color: var(--white);
-        }
         .table th {
-            background-color: rgba(166, 166, 166, 0.2);
-            color: var(--yellow);
-        }
-        .table tbody tr {
-            background-color: var(--black);
-            border-bottom: 1px solid rgba(166, 166, 166, 0.2);
-        }
-        /* Disable hover effect */
-        .table-hover tbody tr:hover {
-            color: var(--white);
-            background-color: var(--black);
+            background-color: #f8f9fa;
         }
         .loading {
             text-align: center;
@@ -58,7 +26,7 @@
         }
         .timestamp {
             font-size: 0.85rem;
-            color: var(--grey);
+            color: #6c757d;
         }
         .long-text {
             max-width: 300px;
@@ -83,37 +51,10 @@
             left: 0;
             right: 0;
             height: 30px;
-            background: linear-gradient(transparent, var(--black));
+            background: linear-gradient(transparent, white);
         }
         .description-cell {
             max-width: 400px;
-            background-color: #121212 !important;
-            padding: 10px !important;
-            border-radius: 4px;
-        }
-        .modal-content {
-            background-color: #121212;
-            color: var(--white);
-        }
-        .modal-header {
-            border-color: var(--grey);
-        }
-        .modal-footer {
-            border-color: var(--grey);
-        }
-        pre {
-            background-color: #1e1e1e !important;
-            color: var(--white) !important;
-        }
-        #fullTextContent {
-            background-color: #1e1e1e !important;
-            color: var(--white) !important;
-        }
-        #textContentModal .modal-body {
-            background-color: #121212;
-        }
-        .text-muted {
-            color: var(--grey) !important;
         }
     </style>
 </head>
@@ -125,7 +66,7 @@
                 <p class="text-muted">View all imported discharge summaries</p>
             </div>
             <div>
-                <a href="index.html" class="btn" style="background-color: transparent; color: var(--grey); border-color: var(--grey);">
+                <a href="index.html" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Back to Dashboard
                 </a>
             </div>
@@ -135,19 +76,19 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">All Discharge Summaries</h5>
-                    <button id="refreshBtn" class="btn btn-sm" style="background-color: transparent; color: var(--yellow); border-color: var(--yellow);">Refresh</button>
+                    <button id="refreshBtn" class="btn btn-sm btn-outline-primary">Refresh</button>
                 </div>
             </div>
             <div class="card-body">
                 <div id="loading" class="loading">
-                    <div class="spinner-border" style="color: var(--yellow);" role="status">
+                    <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <p class="mt-2">Loading discharge summaries...</p>
                 </div>
                 <div id="content" style="display: none;">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -161,7 +102,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div id="noData" class="alert" style="display: none; background-color: #1e1e1e; color: var(--grey); border-color: var(--grey);">
+                    <div id="noData" class="alert alert-info" style="display: none;">
                         No discharge summaries found.
                     </div>
                 </div>
@@ -178,10 +119,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <pre id="fullTextContent" class="p-3" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto; background-color: #1e1e1e; color: var(--white);"></pre>
+                    <pre id="fullTextContent" class="p-3 bg-light" style="white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn" style="background-color: var(--grey); color: var(--black);" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -209,13 +150,13 @@
         function getTagBadgeClass(tag) {
             switch(tag) {
                 case 'HOSPITALIZATION_REQUIRED':
-                    return 'bg-danger text-white';
+                    return 'bg-danger';
                 case 'HOSPITALIZATION_NOT_REQUIRED':
-                    return 'bg-success text-white';
+                    return 'bg-success';
                 case 'UNCERTAIN':
-                    return 'bg-warning text-dark';
+                    return 'bg-warning';
                 case 'ERROR':
-                    return 'bg-secondary text-white';
+                    return 'bg-secondary';
                 default:
                     return 'bg-info';
             }
@@ -250,10 +191,7 @@
             container.appendChild(preview);
             
             const button = document.createElement('a');
-            button.className = 'btn btn-sm';
-            button.style.color = 'var(--blue)';
-            button.style.backgroundColor = 'transparent';
-            button.style.padding = '2px 4px';
+            button.className = 'btn btn-sm btn-link';
             button.textContent = 'Show more';
             button.href = '#';
             button.onclick = (e) => {
@@ -326,7 +264,7 @@
                 console.error('Error fetching discharge summaries:', error);
                 tableEl.innerHTML = `
                     <tr>
-                        <td colspan="4" style="color: var(--red);">
+                        <td colspan="4" class="text-danger">
                             Error loading data. Please try again.
                         </td>
                     </tr>
