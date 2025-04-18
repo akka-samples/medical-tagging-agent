@@ -35,7 +35,6 @@ mvn clean install -DskipTests # Build container image
 - Use `componentClient` for testing components
 - Use `await()` helper method for async test assertions
 
-
 ## UI colors
  - White - #f1f1f1 - in its pure form, like the text you’re reading, is used for most text. Icons and lines are often white, too. There is also an off-white option for rare usage.
  - Yellow - #ffce4a - is our primary accent color. Our brand is black with yellow-forward, which means we will use yellow as the primary accent to the overall black aesthetic. Use yellow for labels and to emphasize key words, outlines in diagrams, icons, etc.
