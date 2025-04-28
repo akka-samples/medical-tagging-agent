@@ -15,4 +15,18 @@ public class StaticResourceEndpoint {
     return HttpResponses.staticResource("index.html"); // <2>
   }
 
+  @Get("/custom-bootstrap.css")
+  public HttpResponse css() {
+    return HttpResponses.staticResource("custom-bootstrap.css");
+  }
+
+  @Get("/discharge-summaries.html")
+  public HttpResponse dischargeSummaries() {
+    return HttpResponses.staticResource("discharge-summaries.html");
+  }
+
+  @Get("/tagged-summaries.html")
+  public HttpResponse taggedSummaries() {
+    return HttpResponses.staticResource("tagged-summaries.html");
+  }
 }

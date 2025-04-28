@@ -1,0 +1,150 @@
+// Custom color variables
+$yellow: #ffce4a;
+$blue: #00dbdd;
+$green: #72d35b;
+$red: #ff5400;
+
+// Override Bootstrap theme colors
+$primary: $yellow;
+$secondary: #ffce4a;
+$success: $green;
+$info: $blue;
+$warning: $yellow;
+$danger: $red;
+$light: #f8f9fa;
+$dark: #212529;
+
+// Dark theme colors
+$body-bg: #000000;
+$body-color: #fff;
+$border-color: #fff;
+
+// Component specific colors
+$card-bg: #1a1a1a;
+$card-cap-bg: #1a1a1a;
+$card-border-color: $border-color;
+
+$modal-content-bg: #121212;
+$modal-content-border-color: $border-color;
+$modal-header-border-color: $border-color;
+$modal-footer-border-color: $border-color;
+
+$table-bg: #000000;
+$table-striped-bg: #0a0a0a;
+$table-hover-bg: #1a1a1a;
+$table-border-color: #333;
+
+$input-bg: #1a1a1a;
+$input-color: #e2e2e2;
+$input-border-color: $border-color;
+$input-focus-bg: #1a1a1a;
+$input-focus-color: #e2e2e2;
+$input-focus-border-color: $primary;
+$input-focus-box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+
+$form-text-color: #a6a6a6;
+$form-check-input-checked-bg-color: $primary;
+$form-check-input-checked-border-color: $primary;
+$form-range-thumb-bg: $primary;
+
+// Set the Bootstrap theme to dark mode
+$theme: "dark";
+
+// Import Bootstrap
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
+
+// Custom styles
+.btn-yellow {
+  @extend .btn-primary;
+}
+
+.btn-blue {
+  background-color: $blue;
+  color: #000;
+  border: none;
+  
+  &:hover {
+    background-color: darken($blue, 10%);
+    color: #000;
+  }
+}
+
+.btn-outline-yellow {
+  @extend .btn-outline-primary;
+}
+
+.btn-outline-grey {
+  @extend .btn-outline-secondary;
+}
+
+.btn-grey {
+  @extend .btn-secondary;
+}
+
+// Long text handling
+.long-text {
+  max-width: 300px;
+  position: relative;
+}
+
+.long-text-preview {
+  max-height: none;
+  overflow: visible;
+  position: relative;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  line-height: 1.4;
+  
+  &.collapsed {
+    max-height: 80px;
+    overflow: hidden;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(transparent, $body-bg);
+    }
+  }
+}
+
+// Cell styling
+.description-cell, .reasoning-cell {
+  max-width: 250px;
+  padding: 10px !important;
+  border-radius: 4px;
+}
+
+// Tag badges
+.tag-badge {
+  font-size: 0.9em;
+  padding: 0.3em 0.6em;
+}
+
+// Confidence filter
+.confidence-filter {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  margin-bottom: 15px;
+  background-color: #1e1e1e;
+}
+
+.confidence-value {
+  display: inline-block;
+  min-width: 3rem;
+  text-align: center;
+  margin-left: 1rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: $blue;
+}
+
+// Loading indicator
+.loading {
+  text-align: center;
+  padding: 40px;
+}

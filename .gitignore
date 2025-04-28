@@ -3,3 +3,4 @@ target
 *.iml
 /samples
 .qodo
+/node_modules
