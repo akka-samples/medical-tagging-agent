@@ -4,6 +4,13 @@ $blue: #00dbdd;
 $green: #72d35b;
 $red: #ff5400;
 
+// Font settings
+$font-family-sans-serif: 'Instrument Sans', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$headings-font-weight: 600;
+
 // Override Bootstrap theme colors
 $primary: $yellow;
 $secondary: #ffce4a;
@@ -17,7 +24,7 @@ $dark: #212529;
 // Dark theme colors
 $body-bg: #000000;
 $body-color: #fff;
-$border-color: #fff;
+$border-color: transparent;
 
 // Component specific colors
 $card-bg: #1a1a1a;
@@ -53,62 +60,80 @@ $theme: "dark";
 // Import Bootstrap
 @import "../../../../node_modules/bootstrap/scss/bootstrap";
 
-// Custom styles
-.btn-yellow {
-  @extend .btn-primary;
+// Custom body styles
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: "Instrument Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
 }
 
-.btn-blue {
-  background-color: $blue;
-  color: #000;
-  border: none;
-  
-  &:hover {
-    background-color: darken($blue, 10%);
-    color: #000;
+// Header styles
+header.app-header {
+  min-height: 80px;
+  position: relative;
+}
+
+.logo-container {
+  min-height: 74px;
+}
+
+.logo {
+  width: 109px;
+  height: 25px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+// Animated top bar
+.top-bar {
+  animation: gradient 6s linear infinite;
+  animation-direction: alternate;
+  background-blend-mode: hard-light;
+  background-size: cover;
+  background: linear-gradient(90deg, #ffce4a, #04c4c5 50%, #d70023);
+  background-size: 150% 100%;
+  height: 6px;
+  width: 100%;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0;
+  }
+  to {
+    background-position: 100%;
   }
 }
 
-.btn-outline-yellow {
-  @extend .btn-outline-primary;
+// Text preview utilities
+.long-text-preview {
+  max-height: 100px;
+  overflow-y: auto;
 }
 
-.btn-outline-grey {
-  @extend .btn-outline-secondary;
+.long-text-preview.collapsed {
+  max-height: 50px;
 }
 
-.btn-grey {
-  @extend .btn-secondary;
+// Code blocks
+pre.code-block {
+  background-color: #1e1e1e;
+  color: #fff;
+  white-space: pre-wrap;
+  border-radius: 0.25rem;
+  padding: 1rem;
 }
 
 // Long text handling
 .long-text {
   max-width: 300px;
   position: relative;
-}
-
-.long-text-preview {
-  max-height: none;
-  overflow: visible;
-  position: relative;
-  margin-bottom: 5px;
-  font-size: 0.9em;
-  line-height: 1.4;
-  
-  &.collapsed {
-    max-height: 80px;
-    overflow: hidden;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 30px;
-      background: linear-gradient(transparent, $body-bg);
-    }
-  }
 }
 
 // Cell styling
@@ -147,4 +172,32 @@ $theme: "dark";
 .loading {
   text-align: center;
   padding: 40px;
+}
+
+// Custom styles
+.btn-yellow {
+  @extend .btn-primary;
+}
+
+.btn-blue {
+  background-color: $blue;
+  color: #000;
+  border: none;
+  
+  &:hover {
+    background-color: darken($blue, 10%);
+    color: #000;
+  }
+}
+
+.btn-outline-yellow {
+  @extend .btn-outline-primary;
+}
+
+.btn-outline-grey {
+  @extend .btn-outline-secondary;
+}
+
+.btn-grey {
+  @extend .btn-secondary;
 }
