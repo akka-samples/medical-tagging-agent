@@ -12,7 +12,7 @@ $font-weight-bold: 700;
 $headings-font-weight: 600;
 
 // Override Bootstrap theme colors
-$primary: $yellow;
+$primary: $blue;
 $secondary: #ffce4a;
 $success: $green;
 $info: $blue;
@@ -36,18 +36,77 @@ $modal-content-border-color: $border-color;
 $modal-header-border-color: $border-color;
 $modal-footer-border-color: $border-color;
 
+// Table variables
 $table-bg: #000000;
 $table-striped-bg: #0a0a0a;
 $table-hover-bg: #1a1a1a;
-$table-border-color: #333;
+$table-border-color: #1a1a1a;
+$table-border-width: 2px;
+$table-cell-padding-y: 0.75rem;
+$table-cell-padding-x: 1rem;
+$table-cell-padding-y-sm: 0.5rem;
+$table-cell-padding-x-sm: 0.75rem;
+$table-cell-vertical-align: middle;
+$table-th-font-weight: 600;
+$table-th-bg: #0a0a0a;
+$table-th-color: $yellow;
+$table-caption-color: $yellow;
+$table-accent-bg: #0a0a0a;
+$table-group-separator-color: #333;
+$table-dark-bg: #000;
+$table-dark-border-color: #333;
+$table-dark-color: #fff;
+
+$table-bg-accent: #1a1a1a;
+$table-bg-striped: #0a0a0a;
+$table-bg-hover: #1a1a1a;
+$table-bg-active: #1a1a1a;
+
+// Button variables
+$btn-padding-y: 0.5rem;
+$btn-padding-x: 1.25rem;
+$btn-font-weight: 500;
+$btn-border-width: 2px;
+$btn-border-radius: 0;
+
+// Primary button (blue)
+$btn-primary-color: #000;
+$btn-primary-bg: $blue;
+$btn-primary-border: $blue;
+$btn-primary-hover-color: $blue;
+$btn-primary-hover-bg: #000;
+$btn-primary-hover-border: $blue;
+$btn-primary-active-color: #000;
+$btn-primary-active-bg: $blue;
+$btn-primary-active-border: $blue;
+
+// Secondary button (blue outline)
+$btn-info-color: #fff;
+$btn-info-bg: transparent;      
+$btn-info-border: $blue;
+$btn-info-hover-color: #fff;
+$btn-info-hover-bg: #000;
+$btn-info-hover-border: $blue;
+$btn-info-active-color: #fff;
+$btn-info-active-bg: $blue;
+$btn-info-active-border: $blue;
 
 $input-bg: #1a1a1a;
 $input-color: #e2e2e2;
-$input-border-color: $border-color;
+$input-border-color: #ffffff;
 $input-focus-bg: #1a1a1a;
 $input-focus-color: #e2e2e2;
 $input-focus-border-color: $primary;
 $input-focus-box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+
+// Textarea specific variables
+$textarea-bg: #1a1a1a;
+$textarea-color: #e2e2e2;
+$textarea-border-color: #ffffff;
+$textarea-focus-bg: #1a1a1a;
+$textarea-focus-color: #ffffff;
+$textarea-focus-border-color: $blue;
+$textarea-focus-box-shadow: 0 0 0 0.25rem rgba($blue, 0.25);
 
 $form-text-color: #a6a6a6;
 $form-check-input-checked-bg-color: $primary;
@@ -60,6 +119,16 @@ $theme: "dark";
 // Import Bootstrap
 @import "../../../../node_modules/bootstrap/scss/bootstrap";
 
+
+
+:root {
+  --black: #000;
+  --white: #fff;
+  --yellow: #ffce4a;
+  --blue: #00dbdd;
+  --green: #72d35b;
+  --red: #ff5400;
+}
 // Custom body styles
 body {
   margin: 0;
@@ -108,6 +177,43 @@ header.app-header {
   }
   to {
     background-position: 100%;
+  }
+}
+
+.card {
+  padding: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+}
+
+// Custom table styles
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  
+  th {
+    background-color: $table-th-bg;
+    color: $table-th-color;
+    font-weight: $table-th-font-weight;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border-bottom: 2px solid $table-border-color;
+  }
+  
+  td {
+    vertical-align: $table-cell-vertical-align;
+  }
+  
+  &.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: $table-striped-bg;
+  }
+  
+  &.table-hover > tbody > tr:hover > * {
+    background-color: $table-hover-bg;
   }
 }
 
@@ -172,6 +278,40 @@ pre.code-block {
 .loading {
   text-align: center;
   padding: 40px;
+}
+
+// Custom textarea styles
+textarea.form-control {
+  background-color: $textarea-bg;
+  color: $textarea-color;
+  border-color: $textarea-border-color;
+  
+  &:focus {
+    background-color: $textarea-focus-bg;
+    color: $textarea-focus-color;
+    border-color: $textarea-focus-border-color;
+    box-shadow: $textarea-focus-box-shadow;
+  }
+}
+
+// Custom button styles
+.btn {
+  padding: $btn-padding-y $btn-padding-x;
+  font-weight: $btn-font-weight;
+  border-width: $btn-border-width;
+  border-radius: $btn-border-radius;
+  transition: all 0.2s ease-in-out
+}
+
+.btn {
+  text-transform: uppercase;
+}
+.btn-primary:hover {
+  background-color: #000;
+  color: $blue;
+}
+.btn-group {
+  gap: 1rem;
 }
 
 // Custom styles
