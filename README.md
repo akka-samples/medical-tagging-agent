@@ -85,6 +85,42 @@ mvn compile exec:java
 
 The service will be available at `http://localhost:9000`.
 
+### SCSS and Styling
+
+The project uses SCSS for styling with Bootstrap 5 dark theme. The SCSS files are located in `src/main/resources/scss/` and compiled to CSS in `src/main/resources/static-resources/`.
+
+#### Available Commands
+
+To compile SCSS to CSS once:
+
+```shell
+npm run build-css
+```
+
+To watch SCSS files for changes and automatically compile:
+
+```shell
+npm run watch-css
+```
+
+#### Bootstrap Dark Theme Configuration
+
+The project uses Bootstrap dark theme which requires:
+
+1. HTML files with `data-bs-theme="dark"` attribute on the html tag
+2. SCSS configuration with:
+   - `$theme: "dark"` variable
+   - Using `@import` instead of `@use` for Bootstrap
+   - Dark theme variables (e.g., `$body-bg: #000000`)
+
+After making changes to SCSS files:
+1. Compile with `npm run build-css`
+2. Rebuild the application with `mvn clean compile`
+
+#### Serving Static Resources
+
+Static resources like CSS files must be explicitly mapped in the `StaticResourceEndpoint.java` class for the Akka framework to properly serve these files.
+
 ### Launch the tagging agent
 
 Go to http://localhost:9000 and click on the "Start Tagging Process".
