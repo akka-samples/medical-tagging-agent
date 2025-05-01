@@ -162,13 +162,13 @@
         function getTagBadgeClass(tag) {
             switch(tag) {
                 case 'HOSPITALIZATION_REQUIRED':
-                    return 'bg-danger text-white';
+                    return 'bg-danger text-dark';
                 case 'HOSPITALIZATION_NOT_REQUIRED':
-                    return 'bg-success text-white';
+                    return 'bg-success text-dark';
                 case 'UNCERTAIN':
                     return 'bg-warning text-dark';
                 case 'ERROR':
-                    return 'bg-secondary text-white';
+                    return 'bg-danger text-dark';
                 default:
                     return 'bg-info';
             }
@@ -203,7 +203,7 @@
             container.appendChild(preview);
             
             const button = document.createElement('a');
-            button.className = 'btn btn-sm';
+            button.className = '';
             button.textContent = 'Show more';
             button.href = '#';
             button.onclick = (e) => {

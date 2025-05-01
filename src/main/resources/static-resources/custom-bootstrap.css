@@ -11615,6 +11615,10 @@ header.app-header {
     background-position: 100%;
   }
 }
+h1, .h1 {
+  color: var(--yellow);
+}
+
 .card {
   padding: 2rem;
   margin-top: 2rem;
