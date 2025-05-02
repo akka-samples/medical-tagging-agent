@@ -1,0 +1,347 @@
+// Custom color variables
+$yellow: #ffce4a;
+$blue: #00dbdd;
+$green: #72d35b;
+$red: #ff5400;
+
+// Font settings
+$font-family-sans-serif: 'Instrument Sans', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$headings-font-weight: 600;
+
+// Override Bootstrap theme colors
+$primary: $blue;
+$secondary: #ffce4a;
+$success: $green;
+$info: $blue;
+$warning: $yellow;
+$danger: $red;
+$light: #f8f9fa;
+$dark: #212529;
+
+// Dark theme colors
+$body-bg: #000000;
+$body-color: #fff;
+$border-color: transparent;
+
+// Component specific colors
+$card-bg: #1a1a1a;
+$card-cap-bg: #1a1a1a;
+$card-border-color: $border-color;
+
+$modal-content-bg: #121212;
+$modal-content-border-color: $border-color;
+$modal-header-border-color: $border-color;
+$modal-footer-border-color: $border-color;
+
+// Table variables
+$table-bg: #000000;
+$table-striped-bg: #0a0a0a;
+$table-hover-bg: #1a1a1a;
+$table-border-color: #1a1a1a;
+$table-border-width: 2px;
+$table-cell-padding-y: 0.75rem;
+$table-cell-padding-x: 1rem;
+$table-cell-padding-y-sm: 0.5rem;
+$table-cell-padding-x-sm: 0.75rem;
+$table-cell-vertical-align: middle;
+$table-th-font-weight: 600;
+$table-th-bg: #0a0a0a;
+$table-th-color: $yellow;
+$table-caption-color: $yellow;
+$table-accent-bg: #0a0a0a;
+$table-group-separator-color: #333;
+$table-dark-bg: #000;
+$table-dark-border-color: #333;
+$table-dark-color: #fff;
+
+$table-bg-accent: #1a1a1a;
+$table-bg-striped: #0a0a0a;
+$table-bg-hover: #1a1a1a;
+$table-bg-active: #1a1a1a;
+
+// Button variables
+$btn-padding-y: 0.5rem;
+$btn-padding-x: 1.25rem;
+$btn-font-weight: 500;
+$btn-border-width: 2px;
+$btn-border-radius: 0;
+
+// Primary button (blue)
+$btn-primary-color: #000;
+$btn-primary-bg: $blue;
+$btn-primary-border: $blue;
+$btn-primary-hover-color: $blue;
+$btn-primary-hover-bg: #000;
+$btn-primary-hover-border: $blue;
+$btn-primary-active-color: #000;
+$btn-primary-active-bg: $blue;
+$btn-primary-active-border: $blue;
+
+// Secondary button (blue outline)
+$btn-info-color: #fff;
+$btn-info-bg: transparent;      
+$btn-info-border: $blue;
+$btn-info-hover-color: #fff;
+$btn-info-hover-bg: #000;
+$btn-info-hover-border: $blue;
+$btn-info-active-color: #fff;
+$btn-info-active-bg: $blue;
+$btn-info-active-border: $blue;
+
+$input-bg: #1a1a1a;
+$input-color: #e2e2e2;
+$input-border-color: #ffffff;
+$input-focus-bg: #1a1a1a;
+$input-focus-color: #e2e2e2;
+$input-focus-border-color: $primary;
+$input-focus-box-shadow: 0 0 0 0.25rem rgba($primary, 0.25);
+
+// Textarea specific variables
+$textarea-bg: #1a1a1a;
+$textarea-color: #e2e2e2;
+$textarea-border-color: #ffffff;
+$textarea-focus-bg: #1a1a1a;
+$textarea-focus-color: #ffffff;
+$textarea-focus-border-color: $blue;
+$textarea-focus-box-shadow: 0 0 0 0.25rem rgba($blue, 0.25);
+
+$form-text-color: #a6a6a6;
+$form-check-input-checked-bg-color: $primary;
+$form-check-input-checked-border-color: $primary;
+$form-range-thumb-bg: $primary;
+
+// Set the Bootstrap theme to dark mode
+$theme: "dark";
+
+// Import Bootstrap
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
+
+
+
+:root {
+  --black: #000;
+  --white: #fff;
+  --yellow: #ffce4a;
+  --blue: #00dbdd;
+  --green: #72d35b;
+  --red: #ff5400;
+}
+// Custom body styles
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: "Instrument Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+// Header styles
+header.app-header {
+  min-height: 80px;
+  position: relative;
+}
+
+.logo-container {
+  min-height: 74px;
+}
+
+.logo {
+  width: 109px;
+  height: 25px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+// Animated top bar
+.top-bar {
+  animation: gradient 6s linear infinite;
+  animation-direction: alternate;
+  background-blend-mode: hard-light;
+  background-size: cover;
+  background: linear-gradient(90deg, #ffce4a, #04c4c5 50%, #d70023);
+  background-size: 150% 100%;
+  height: 6px;
+  width: 100%;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0;
+  }
+  to {
+    background-position: 100%;
+  }
+}
+
+h1 {
+  color: var(--yellow);
+}
+
+.card {
+  padding: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+}
+
+// Custom table styles
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  
+  th {
+    background-color: $table-th-bg;
+    color: $table-th-color;
+    font-weight: $table-th-font-weight;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border-bottom: 2px solid $table-border-color;
+  }
+  
+  td {
+    vertical-align: $table-cell-vertical-align;
+  }
+  
+  &.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: $table-striped-bg;
+  }
+  
+  &.table-hover > tbody > tr:hover > * {
+    background-color: $table-hover-bg;
+  }
+}
+
+// Text preview utilities
+.long-text-preview {
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.long-text-preview.collapsed {
+  max-height: 50px;
+}
+
+// Code blocks
+pre.code-block {
+  background-color: #1e1e1e;
+  color: #fff;
+  white-space: pre-wrap;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+// Long text handling
+.long-text {
+  max-width: 300px;
+  position: relative;
+}
+
+// Cell styling
+.description-cell, .reasoning-cell {
+  max-width: 250px;
+  padding: 10px !important;
+  border-radius: 4px;
+}
+
+// Tag badges
+.tag-badge {
+  font-size: 0.9em;
+  padding: 0.3em 0.6em;
+}
+
+// Confidence filter
+.confidence-filter {
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  margin-bottom: 15px;
+  background-color: #1e1e1e;
+}
+
+.confidence-value {
+  display: inline-block;
+  min-width: 3rem;
+  text-align: center;
+  margin-left: 1rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: $blue;
+}
+
+// Loading indicator
+.loading {
+  text-align: center;
+  padding: 40px;
+}
+
+// Custom textarea styles
+textarea.form-control {
+  background-color: $textarea-bg;
+  color: $textarea-color;
+  border-color: $textarea-border-color;
+  
+  &:focus {
+    background-color: $textarea-focus-bg;
+    color: $textarea-focus-color;
+    border-color: $textarea-focus-border-color;
+    box-shadow: $textarea-focus-box-shadow;
+  }
+}
+
+// Custom button styles
+.btn {
+  padding: $btn-padding-y $btn-padding-x;
+  font-weight: $btn-font-weight;
+  border-width: $btn-border-width;
+  border-radius: $btn-border-radius;
+  transition: all 0.2s ease-in-out
+}
+
+.btn {
+  text-transform: uppercase;
+}
+.btn-primary:hover {
+  background-color: #000;
+  color: $blue;
+}
+.btn-group {
+  gap: 1rem;
+}
+
+// Custom styles
+.btn-yellow {
+  @extend .btn-primary;
+}
+
+.btn-blue {
+  background-color: $blue;
+  color: #000;
+  border: none;
+  
+  &:hover {
+    background-color: darken($blue, 10%);
+    color: #000;
+  }
+}
+
+.btn-outline-yellow {
+  @extend .btn-outline-primary;
+}
+
+.btn-outline-grey {
+  @extend .btn-outline-secondary;
+}
+
+.btn-grey {
+  @extend .btn-secondary;
+}
