@@ -1,0 +1,21 @@
+{
+  "name": "medical-tagging-agent",
+  "version": "1.0.0",
+  "description": "## Problem Statement",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "sass src/main/resources/scss/custom.scss:src/main/resources/static-resources/custom-bootstrap.css --style compressed",
+    "watch-css": "sass --watch src/main/resources/scss/custom.scss:src/main/resources/static-resources/custom-bootstrap.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.0-alpha1",
+    "sass": "^1.87.0"
+  }
+}

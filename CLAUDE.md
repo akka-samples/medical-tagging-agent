@@ -34,3 +34,11 @@ mvn clean install -DskipTests # Build container image
 - Use JUnit 5 annotations (@Test, etc.)
 - Use `componentClient` for testing components
 - Use `await()` helper method for async test assertions
+
+## UI colors
+ - White - #f1f1f1 - in its pure form, like the text you’re reading, is used for most text. Icons and lines are often white, too. There is also an off-white option for rare usage.
+ - Yellow - #ffce4a - is our primary accent color. Our brand is black with yellow-forward, which means we will use yellow as the primary accent to the overall black aesthetic. Use yellow for labels and to emphasize key words, outlines in diagrams, icons, etc.
+ - Blue - #00dbdd - is our CTA (call-to-action) color, which is used for hyperlinks in slides, and as CTA buttons on the website. Use this very sparingly as an accent color.
+ - Green - #72d35b - is to be used for highlighting really important positive ideas, benefits, and GOOD things. Use as an accent color, and always use less than yellow.
+ - Red - #ff5400 - this is to be used for highlighting negative ideas, problems, warnings, and BAD things. Use as an accent color, and always use less than yellow.
+ - Grey - #a6a6a6 - and Black - #000000 - are used in the background designs of the slide layouts. Sometimes you will use a pure black or grey box to highlight an area.

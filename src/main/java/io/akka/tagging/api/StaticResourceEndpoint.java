@@ -10,9 +10,23 @@ import akka.javasdk.http.HttpResponses;
 @Acl(allow = @Acl.Matcher(principal = Acl.Principal.ALL))
 public class StaticResourceEndpoint {
 
-  @Get("/") // <1>
+  @Get("/")
   public HttpResponse index() {
-    return HttpResponses.staticResource("index.html"); // <2>
+    return HttpResponses.staticResource("index.html");
+  }
+  
+  @Get("/custom-bootstrap.css")
+  public HttpResponse css() {
+    return HttpResponses.staticResource("custom-bootstrap.css");
   }
 
+  @Get("/discharge-summaries.html")
+  public HttpResponse dischargeSummaries() {
+    return HttpResponses.staticResource("discharge-summaries.html");
+  }
+
+  @Get("/tagged-summaries.html")
+  public HttpResponse taggedSummaries() {
+    return HttpResponses.staticResource("tagged-summaries.html");
+  }
 }
