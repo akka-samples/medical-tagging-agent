@@ -1,5 +1,6 @@
 package io.akka.tagging.api;
 
+import akka.javasdk.agent.PromptTemplate;
 import akka.javasdk.annotations.Acl;
 import akka.javasdk.annotations.http.Get;
 import akka.javasdk.annotations.http.HttpEndpoint;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static io.akka.ai.application.AiTaggingService.TAGGING_REQUEST_MESSAGE;
+import static io.akka.tagging.application.TaggingAgent.TAGGING_REQUEST_MESSAGE;
 
 @HttpEndpoint
 @Acl(allow = @Acl.Matcher(principal = Acl.Principal.ALL))
@@ -69,6 +70,11 @@ public class TaggingEndpoint {
     var countResult = componentClient.forView()
       .method(TaggingView::getCount)
       .invoke();
+
+    //keep the history of prompts
+    componentClient.forEventSourcedEntity("tagging-prompt")
+      .method(PromptTemplate::update)
+      .invoke(startTagging.prompt());
 
     long workflowId = countResult.count() + 1;
     log.info("Starting tagging workflow with id {}", workflowId);

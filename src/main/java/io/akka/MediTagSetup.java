@@ -2,15 +2,10 @@ package io.akka;
 
 import akka.javasdk.DependencyProvider;
 import akka.javasdk.ServiceSetup;
+import akka.javasdk.agent.ModelProvider;
 import akka.javasdk.annotations.Setup;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.timer.TimerScheduler;
-import io.akka.ai.application.AIClient;
-import io.akka.ai.application.AiTaggingService;
-import io.akka.ai.application.FakeAiClient;
-import io.akka.ai.application.OpenAiClient;
-import io.akka.ai.application.TaggingService;
-import io.akka.common.KeyUtils;
 import io.akka.importer.application.FakeImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,31 +33,29 @@ public class MediTagSetup implements ServiceSetup {
 //        .method(KidAidImporterAction::importData)
 //        .deferred()
         .method(FakeImporter::importData)
-        .deferred(50)
+        .deferred(20)
     );
   }
 
   @Override
   public DependencyProvider createDependencyProvider() {
 
-    var taggingService = new AiTaggingService(getAiClient());
+    var modelProvider = getModelProvider();
 
     return new DependencyProvider() {
       @Override
       public <T> T getDependency(Class<T> cls) {
-        if (cls.equals(TaggingService.class)) {
-          return (T) taggingService;
+        if (cls.equals(ModelProvider.class)) {
+          return (T) modelProvider;
         }
         return null;
       }
     };
   }
 
-  private static AIClient getAiClient() {
-    if (KeyUtils.hasOpenAiKey()) {
-      return new OpenAiClient();
-    }
-    logger.warn("Ai client not configured. OPENAI_API_KEY environment variable is not set. Using Fake Ai client.");
-    return new FakeAiClient();
+  private static ModelProvider getModelProvider() {
+    return ModelProvider.openAi()
+      .withApiKey(System.getenv("OPENAI_API_KEY"))
+      .withModelName("gpt-4o");
   }
 }
