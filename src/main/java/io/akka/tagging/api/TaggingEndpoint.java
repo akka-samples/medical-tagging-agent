@@ -71,7 +71,7 @@ public class TaggingEndpoint {
       .method(TaggingView::getCount)
       .invoke();
 
-    //keep the history of prompts
+    //keep the history of prompts, this is redundant as the workflow state keeps the prompt, but useful for debugging
     componentClient.forEventSourcedEntity("tagging-prompt")
       .method(PromptTemplate::update)
       .invoke(startTagging.prompt());

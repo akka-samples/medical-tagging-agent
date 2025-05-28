@@ -7,6 +7,8 @@ import akka.javasdk.annotations.AgentDescription;
 import akka.javasdk.annotations.ComponentId;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ComponentId("tagging-agent")
 @AgentDescription(name = "Tagging agent", description = "Tag medical discharge summaries with hospitalization tags")
@@ -32,6 +34,7 @@ public class TaggingAgent extends Agent {
     Here is the discharge summary:
     
     """;
+  private static final Logger log = LoggerFactory.getLogger(TaggingAgent.class);
 
   record OpenAiTaggingResult(
     HospitalizationTag tag,
@@ -60,11 +63,9 @@ public class TaggingAgent extends Agent {
       .onFailure(throwable -> {
         if (throwable instanceof JsonParsingException jsonParsingException) {
           // Log the raw JSON for debugging purposes
-          System.err.println("Raw JSON: " + jsonParsingException.getRawJson());
-          throw new RuntimeException(throwable);
-        } else {
-          throw new RuntimeException(throwable);
+          log.error(jsonParsingException.getMessage() + ", raw JSON: " + jsonParsingException.getRawJson(), throwable);
         }
+        throw new RuntimeException(throwable);
       })
       .thenReply();
   }
