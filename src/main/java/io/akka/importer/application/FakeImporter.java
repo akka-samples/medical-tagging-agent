@@ -38,8 +38,8 @@ public class FakeImporter extends TimedAction {
   }
 
   public Effect importData(int howMany) {
-    IntStream.range(1, howMany)
-      .forEach(this::createRandomDischargeSummary);
+    IntStream.range(0, howMany)
+      .forEach(i -> createRandomDischargeSummary(i + 1));
     log.info("Created {} random discharge summaries", howMany);
     return effects().done();
   }

@@ -4,7 +4,6 @@ import akka.Done;
 import akka.javasdk.annotations.ComponentId;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.workflow.Workflow;
-import io.akka.ai.application.TaggingService;
 import io.akka.tagging.domain.DischargeSummary;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggedDischargeSummary;
@@ -26,12 +25,10 @@ public class TaggingWorkflow extends Workflow<Tagging> {
 
   private static final Logger logger = LoggerFactory.getLogger(TaggingWorkflow.class);
   public static final int AI_CALL_BATCH_SIZE = 10;
-  private final TaggingService taggingService;
   private final ComponentClient componentClient;
   private final Executor virtualThreadExecutor;
 
-  public TaggingWorkflow(TaggingService taggingService, ComponentClient componentClient, Executor virtualThreadExecutor) {
-    this.taggingService = taggingService;
+  public TaggingWorkflow(ComponentClient componentClient, Executor virtualThreadExecutor) {
     this.componentClient = componentClient;
     this.virtualThreadExecutor = virtualThreadExecutor;
   }
@@ -114,7 +111,12 @@ public class TaggingWorkflow extends Workflow<Tagging> {
       .invoke();
 
     try {
-      var taggingResult = taggingService.tagDischargeSummary(summary, currentState().prompt());
+      String taggingWorkflowId = currentState().id();
+      String sessionId = taggingWorkflowId + "-" + id; //could be UUID.randomUUID().toString() for more uniqueness
+      var taggingResult = componentClient.forAgent()
+        .inSession(sessionId)
+        .method(TaggingAgent::run)
+        .invoke(new TaggingAgent.TagSummary(currentState().prompt(), summary.summary()));
 
       logger.info("Tagged summary {} with tag {} (confidence: {}%)", summary.id(), taggingResult.tag(), taggingResult.confidencePercentage());
       var taggedSummary = createTaggedSummary(summary, taggingResult);

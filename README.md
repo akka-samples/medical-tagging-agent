@@ -77,6 +77,12 @@ mvn compile
 
 ### Running Locally
 
+Export the necessary environment variables for the Akka service:
+
+```shell
+export OPENAI_API_KEY = "your_openai_api_key"
+```
+
 To start the service locally, run:
 
 ```shell
