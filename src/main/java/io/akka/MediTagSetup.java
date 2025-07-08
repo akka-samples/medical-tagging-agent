@@ -1,11 +1,10 @@
 package io.akka;
 
-import akka.javasdk.DependencyProvider;
 import akka.javasdk.ServiceSetup;
-import akka.javasdk.agent.ModelProvider;
 import akka.javasdk.annotations.Setup;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.timer.TimerScheduler;
+import com.typesafe.config.Config;
 import io.akka.importer.application.FakeImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,12 @@ public class MediTagSetup implements ServiceSetup {
   private final ComponentClient componentClient;
   private final TimerScheduler timerScheduler;
 
-  public MediTagSetup(ComponentClient componentClient, TimerScheduler timerScheduler) {
+  public MediTagSetup(Config config, ComponentClient componentClient, TimerScheduler timerScheduler) {
+    if (config.getString("akka.javasdk.agent.model-provider").equals("openai")
+      && config.getString("akka.javasdk.agent.openai.api-key").isBlank()) {
+      throw new IllegalStateException(
+        "No API keys found. Make sure you have OPENAI_API_KEY defined as environment variable, or change the model provider configuration in application.conf to use a different LLM.");
+    }
     this.componentClient = componentClient;
     this.timerScheduler = timerScheduler;
   }
@@ -30,32 +34,8 @@ public class MediTagSetup implements ServiceSetup {
     timerScheduler.createSingleTimer("import-data",
       ofSeconds(1),
       componentClient.forTimedAction()
-//        .method(KidAidImporterAction::importData)
-//        .deferred()
         .method(FakeImporter::importData)
         .deferred(20)
     );
-  }
-
-  @Override
-  public DependencyProvider createDependencyProvider() {
-
-    var modelProvider = getModelProvider();
-
-    return new DependencyProvider() {
-      @Override
-      public <T> T getDependency(Class<T> cls) {
-        if (cls.equals(ModelProvider.class)) {
-          return (T) modelProvider;
-        }
-        return null;
-      }
-    };
-  }
-
-  private static ModelProvider getModelProvider() {
-    return ModelProvider.openAi()
-      .withApiKey(System.getenv("OPENAI_API_KEY"))
-      .withModelName("gpt-4o");
   }
 }
