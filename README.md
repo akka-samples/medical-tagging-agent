@@ -83,6 +83,8 @@ Export the necessary environment variables for the Akka service:
 export OPENAI_API_KEY = "your_openai_api_key"
 ```
 
+Or change the `application.conf` file to use a different model provider.
+
 To start the service locally, run:
 
 ```shell

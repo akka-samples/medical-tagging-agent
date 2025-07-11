@@ -2,9 +2,9 @@ package io.akka.tagging.application;
 
 import akka.javasdk.agent.Agent;
 import akka.javasdk.agent.JsonParsingException;
-import akka.javasdk.agent.ModelProvider;
 import akka.javasdk.annotations.AgentDescription;
 import akka.javasdk.annotations.ComponentId;
+import com.typesafe.config.Config;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggingResult;
 import org.slf4j.Logger;
@@ -46,20 +46,19 @@ public class TaggingAgent extends Agent {
   public record TagSummary(String systemPrompt, String dischargeSummary) {
   }
 
-  private final ModelProvider modelProvider;
+  private final Config config;
 
-  public TaggingAgent(ModelProvider modelProvider) {
-    this.modelProvider = modelProvider;
+  public TaggingAgent(Config config) {
+    this.config = config;
   }
 
   public Effect<TaggingResult> run(TagSummary tagSummary) {
 
     return effects()
-      .model(modelProvider)
       .systemMessage(tagSummary.systemPrompt)
       .userMessage(tagSummary.dischargeSummary)
       .responseAs(OpenAiTaggingResult.class)
-      .map(res -> new TaggingResult(res.tag(), res.confidencePercentage(), res.reasoning(), getModelName(modelProvider)))
+      .map(res -> new TaggingResult(res.tag(), res.confidencePercentage(), res.reasoning(), getModelName()))
       .onFailure(throwable -> {
         if (throwable instanceof JsonParsingException jsonParsingException) {
           // Log the raw JSON for debugging purposes
@@ -70,11 +69,12 @@ public class TaggingAgent extends Agent {
       .thenReply();
   }
 
-  private String getModelName(ModelProvider modelProvider) {
-    if (modelProvider instanceof ModelProvider.OpenAi openAi) {
-      return openAi.modelName();
-    } else {
+  private String getModelName() {
+    var openAiModel = config.getString("akka.javasdk.agent.openai.model-name");
+    if (openAiModel.isBlank()) {
       return "unknown-model";
+    } else {
+      return openAiModel;
     }
   }
 }
