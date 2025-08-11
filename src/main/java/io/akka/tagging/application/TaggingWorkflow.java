@@ -39,16 +39,12 @@ public class TaggingWorkflow extends Workflow<Tagging> {
   record TaggingBatchResult(List<Integer> ids, int correctTags) {
   }
 
-  @Override
-  public WorkflowDef<Tagging> definition() {
-    var taggingStep =
-      step("tagging")
-        .call(() -> runBatch(AI_CALL_BATCH_SIZE))
-        .andThen(TaggingBatchResult.class, this::stopOrContinue)
-        .timeout(Duration.ofMinutes(1));
 
-    return workflow()
-      .addStep(taggingStep);
+  @Override
+  public WorkflowSettings settings() {
+    return WorkflowSettings.builder()
+      .stepTimeout(TaggingWorkflow::tagging, Duration.ofMinutes(1))
+      .build();
   }
 
   public Effect<Done> start(StartTagging startTagging) {
@@ -58,8 +54,22 @@ public class TaggingWorkflow extends Workflow<Tagging> {
     }
     return effects()
       .updateState(Tagging.create(commandContext().workflowId(), startTagging.prompt, startTagging.summaryIds))
-      .transitionTo("tagging")
+      .transitionTo(TaggingWorkflow::tagging)
       .thenReply(done());
+  }
+
+  private StepEffect tagging() {
+
+    var taggingBatchResult = runBatch();
+    var updatedJob = currentState().updateProgress(taggingBatchResult.ids, taggingBatchResult.correctTags);
+
+    if (updatedJob.isFinished()) {
+      return stepEffects().updateState(updatedJob).thenEnd();
+    } else {
+      return stepEffects()
+        .updateState(updatedJob)
+        .thenTransitionTo(TaggingWorkflow::tagging);
+    }
   }
 
   public Effect<Tagging> get() {
@@ -70,8 +80,9 @@ public class TaggingWorkflow extends Workflow<Tagging> {
     }
   }
 
-  private TaggingBatchResult runBatch(int batchSize) {
-    var pendingSummaryIds = currentState().getPendingBatch(batchSize);
+  private TaggingBatchResult runBatch() {
+
+    var pendingSummaryIds = currentState().getPendingBatch(AI_CALL_BATCH_SIZE);
 
     //start tagging in parallel
     var completableFutures = pendingSummaryIds.stream().map(id ->
@@ -82,21 +93,6 @@ public class TaggingWorkflow extends Workflow<Tagging> {
     var taggedSummaries = completableFutures.stream().map(CompletableFuture::join).toList();
 
     return new TaggingBatchResult(pendingSummaryIds, countCorrect(taggedSummaries));
-  }
-
-  private Effect.TransitionalEffect<Void> stopOrContinue(TaggingBatchResult taggingBatchResult) {
-    var updatedJob = currentState().updateProgress(taggingBatchResult.ids, taggingBatchResult.correctTags);
-    if (updatedJob.isFinished()) {
-      logger.info("Tagging job {} is finished, progress [{}]", currentState().id(), updatedJob.progress());
-      return effects()
-        .updateState(updatedJob)
-        .end();
-    } else {
-      logger.info("Tagging job {} is not finished yet, progress [{}]", currentState().id(), updatedJob.progress());
-      return effects()
-        .updateState(updatedJob)
-        .transitionTo("tagging");
-    }
   }
 
   private int countCorrect(List<TaggedDischargeSummary> taggedSummaries) {
