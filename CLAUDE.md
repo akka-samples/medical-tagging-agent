@@ -1,44 +1,163 @@
-# CLAUDE.md - Akka Java SDK Project Guidelines
+# AI coding assistant guidelines
 
-## Build Commands
+This file provides guidance to AI coding assistant when working with code in this repository.
+
+## Project overview
+
+See @README.md for a project overview, and how to build, test and run the application.
+
+## Coding guidelines
+
+Use the detailed instructions in @AGENTS.md when writing Akka code.
+
+Use the guidelines in @akka-context/sdk/ai-coding-assistant-guidelines.html.md when writing code in this project.
+
+## Akka documentation
+
+You find the reference documentation of Akka in the akka-context directory and sub-directories.
+Read this documentation to answer questions about Akka.
+
+## Incremental Generation Workflow
+
+**Work step-by-step with user approval between major phases. Keep explanations brief - developers prefer concise communication.**
+
+**CRITICAL: After completing each step below, you MUST STOP and WAIT for explicit user approval before proceeding to the next step. When you ask "Ready for X?", you are NOT allowed to continue until the user responds. NEVER create code for the next step until the user says "yes", "proceed", or similar.**
+
+Create one component and a corresponding test at a time, with user feedback in between. If there are several components involved in the task some steps below should be repeated for each component. For example: create an entity, create unit test for the entity, create view, create test for the view, create endpoint for the entity and view, create integration test for the endpoint.
+
+1. **Always wait** for user approval between major steps - this is MANDATORY
+2. **If user says "proceed"/"yes","y"**, continue to next step
+3. **If user provides feedback**, adjust and re-present
+4. **If user says "skip X"**, skip that step
+5. **Keep focused** - don't jump ahead, don't create multiple steps at once
+6. **Brief explanations** - what you did, not verbose details
+
+This approach enables early validation, catches issues before coding, and allows mid-course adjustments.
+
+### Step 0: Documentation Check (complex components only)
+
+For first-time or complex components:
+1. Read relevant `akka-context/sdk/*.html.md`
+2. Extract code examples, verify imports/patterns
+3. Brief note: "📚 Reviewed {doc}"
+
+### Step 1: Design & Planning
+
+Present concise design:
+```markdown
+## Proposed Design
+
+### Components
+- Entity: CreditCardEntity (Event Sourced - need audit trail)
+- View: CreditCardsByCardholderView
+- Endpoint: CreditCardEndpoint
+
+### Domain Model
+**CreditCard (state):** cardId, cardNumber, cardholderName, creditLimit, currentBalance, active
+
+**Events:** CardActivated, CardCharged, PaymentMade, CardBlocked
+
+**Commands:** activate, charge, makePayment, block
+
+### Integration
+- View consumes: CardActivated, CardCharged, PaymentMade, CardBlocked
+- Endpoint exposes: POST /cards/{id}/activate, POST /cards/{id}/charge, GET /cards/by-cardholder/{name}
+
+Does this design look good? Should I proceed?
 ```
-mvn compile                   # Compile the project
-mvn test                      # Run all tests
-mvn test -Dtest=IntegrationTest    # Run a specific test class
-mvn test -Dtest=IntegrationTest#test    # Run a specific test method
-mvn exec:java                 # Run the service locally
-mvn clean install -DskipTests # Build container image
+
+**STOP and wait for user approval**
+
+### Step 2: Domain Layer
+
+Create domain classes. Verify with `mvn compile`.
+
+Report briefly:
+```markdown
+Created domain layer:
+- domain/CreditCard.java (4 events)
+- domain/CreditCardEvent.java
+
+Ready for Entity?
 ```
 
-## Code Style Guidelines
-- **Imports**: Organize imports with standard Java packages first, then third-party packages, then project-specific packages
-- **Package Structure**: Follow `io.akka.[domain-module].[api|application|domain]` organization
-- **Naming**: Use camelCase for methods/variables, PascalCase for classes
-- **Async**: Return `CompletionStage<T>` for async operations
-- **Error Handling**: Use CompletableFuture exception handling for async code
-- **Comments**: Use JavaDoc for public classes and methods
-- **Access Control**: Be mindful of Akka @Acl annotations for endpoints
+**STOP and wait for user approval**
 
-## Domain Model and Component Structure
-- Use record classes for immutable domain models
-- Prefer Java Optional for nullable values
-- Implement sealed interfaces for event types with @TypeName annotations
-- Use EventSourcedEntity for stateful components (@ComponentId)
-- Implement HTTP endpoints with @HttpEndpoint and path annotations
-- Use ComponentClient for inter-component communication
-- Key Value Entities, Event Sourced Entities, Workflows can accept only single method parameter, wrap multiple parameters in a record class
-- applyEvent method should return never return null, return the current state or throw an exception
+### Step 3: Application Layer
 
-## Testing
-- Extend `TestKitSupport` for integration tests
-- Use JUnit 5 annotations (@Test, etc.)
-- Use `componentClient` for testing components
-- Use `await()` helper method for async test assertions
+Create one component at a time, with user feedback in between.
 
-## UI colors
- - White - #f1f1f1 - in its pure form, like the text you’re reading, is used for most text. Icons and lines are often white, too. There is also an off-white option for rare usage.
- - Yellow - #ffce4a - is our primary accent color. Our brand is black with yellow-forward, which means we will use yellow as the primary accent to the overall black aesthetic. Use yellow for labels and to emphasize key words, outlines in diagrams, icons, etc.
- - Blue - #00dbdd - is our CTA (call-to-action) color, which is used for hyperlinks in slides, and as CTA buttons on the website. Use this very sparingly as an accent color.
- - Green - #72d35b - is to be used for highlighting really important positive ideas, benefits, and GOOD things. Use as an accent color, and always use less than yellow.
- - Red - #ff5400 - this is to be used for highlighting negative ideas, problems, warnings, and BAD things. Use as an accent color, and always use less than yellow.
- - Grey - #a6a6a6 - and Black - #000000 - are used in the background designs of the slide layouts. Sometimes you will use a pure black or grey box to highlight an area.
+Create application components. Verify with `mvn compile`.
+
+Report briefly:
+```markdown
+Created application layer entity:
+- application/CreditCardEntity.java (5 command handlers)
+
+Please review.
+
+Ready for tests?
+```
+
+**STOP and wait for user approval**
+
+### Step 4: Tests
+
+Create one test at a time, with user feedback in between.
+
+Create tests for the component in the previous step. Verify with `mvn test` or with `mvn verify` for IntegrationTest.
+
+Report briefly:
+```markdown
+Created tests:
+- CreditCardEntityTest.java (8 test cases)
+
+Please review.
+
+Ready for API layer?
+```
+
+**STOP and wait for user approval**
+
+### Step 5: API Layer
+
+Create/update endpoint. Verify with `mvn compile`.
+
+Report briefly:
+```markdown
+Updated API layer:
+- api/CreditCardEndpoint.java
+  - POST /cards/{id}/activate
+  - POST /cards/{id}/charge
+  - GET /cards/by-cardholder/{name}
+
+Please review.
+
+Ready for integration tests?
+```
+
+**STOP and wait for user approval**
+
+### Step 6: API Layer integration tests
+
+Create tests for the endpoint in the previous step. Verify with `mvn verify`.
+
+Report briefly:
+```markdown
+Created tests:
+- CreditCardEndpointIntegrationTest.java (6 test cases)
+
+Please review.
+
+Do you also want me to update the readme and include example curl commands of the endpoint?
+```
+
+**STOP and wait for user approval**
+
+### Step 7: Documentation
+
+```markdown
+Updated README.md with curl examples.
+
+Done! Created 2 domain classes, 1 entity, 1 view, 3 tests, 1 endpoint.
+```
