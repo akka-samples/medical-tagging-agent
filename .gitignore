@@ -5,3 +5,5 @@ target
 .qodo
 /node_modules
 .DS_Store
+akka-context
+AGENTS.md
