@@ -1,6 +1,6 @@
 package io.akka.tagging.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.annotations.DeleteHandler;
 import akka.javasdk.annotations.Query;
@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-@ComponentId("tagging-view")
+@Component(id = "tagging-view")
 public class TaggingView extends View {
 
   public record TaggingEntry(String id, Instant startedAt, Optional<Instant> finishedAt, String prompt, int progress,

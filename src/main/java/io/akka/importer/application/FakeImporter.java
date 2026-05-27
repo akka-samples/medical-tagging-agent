@@ -1,7 +1,7 @@
 package io.akka.importer.application;
 
 import akka.Done;
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.timedaction.TimedAction;
 import io.akka.tagging.application.DischargeSummaryEntity;
@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 import static io.akka.tagging.domain.HospitalizationTag.getRandomTag;
 
 
-@ComponentId("fake-importer")
+@Component(id = "fake-importer")
 public class FakeImporter extends TimedAction {
 
   private static final Logger log = LoggerFactory.getLogger(FakeImporter.class);

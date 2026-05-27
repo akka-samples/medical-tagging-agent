@@ -1,6 +1,6 @@
 package io.akka.tagging.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.annotations.Query;
 import akka.javasdk.view.TableUpdater;
@@ -9,7 +9,7 @@ import io.akka.tagging.domain.TaggedDischargeSummary;
 
 import java.util.List;
 
-@ComponentId("tagged-discharge-summary-view")
+@Component(id = "tagged-discharge-summary-view")
 public class TaggedDischargeSummaryView extends View {
 
   public record TaggedSummaries(List<TaggedDischargeSummary> summaries) {
