@@ -1,7 +1,7 @@
 package io.akka.tagging.application;
 
 import akka.Done;
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.keyvalueentity.KeyValueEntity;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggedDischargeSummary;
@@ -13,7 +13,7 @@ import java.time.Instant;
 import static akka.Done.done;
 
 
-@ComponentId("tagged-discharge-summary")
+@Component(id = "tagged-discharge-summary")
 public class TaggedDischargeSummaryEntity extends KeyValueEntity<TaggedDischargeSummary> {
 
   private static final Logger logger = LoggerFactory.getLogger(TaggedDischargeSummaryEntity.class);

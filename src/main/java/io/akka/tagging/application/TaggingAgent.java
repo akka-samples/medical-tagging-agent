@@ -2,16 +2,14 @@ package io.akka.tagging.application;
 
 import akka.javasdk.agent.Agent;
 import akka.javasdk.agent.JsonParsingException;
-import akka.javasdk.annotations.AgentDescription;
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import com.typesafe.config.Config;
 import io.akka.tagging.domain.HospitalizationTag;
 import io.akka.tagging.domain.TaggingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ComponentId("tagging-agent")
-@AgentDescription(name = "Tagging agent", description = "Tag medical discharge summaries with hospitalization tags")
+@Component(id = "tagging-agent", name = "Tagging agent", description = "Tag medical discharge summaries with hospitalization tags")
 public class TaggingAgent extends Agent {
 
   public static final String TAGGING_REQUEST_MESSAGE = """

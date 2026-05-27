@@ -1,7 +1,7 @@
 package io.akka.tagging.application;
 
 import akka.Done;
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.client.ComponentClient;
 import akka.javasdk.workflow.Workflow;
 import io.akka.tagging.domain.DischargeSummary;
@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
 
 import static akka.Done.done;
 
-@ComponentId("tagging-workflow")
+@Component(id = "tagging-workflow")
 public class TaggingWorkflow extends Workflow<Tagging> {
 
   private static final Logger logger = LoggerFactory.getLogger(TaggingWorkflow.class);

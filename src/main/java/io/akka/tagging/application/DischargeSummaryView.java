@@ -1,6 +1,6 @@
 package io.akka.tagging.application;
 
-import akka.javasdk.annotations.ComponentId;
+import akka.javasdk.annotations.Component;
 import akka.javasdk.annotations.Consume;
 import akka.javasdk.annotations.DeleteHandler;
 import akka.javasdk.annotations.Query;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * A View to query discharge summaries
  */
-@ComponentId("discharge-summaries-view")
+@Component(id = "discharge-summaries-view")
 public class DischargeSummaryView extends View {
 
 
